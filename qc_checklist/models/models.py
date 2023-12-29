@@ -162,7 +162,7 @@ class ProductTemplate(models.Model):
 
     vendor_list_ids = fields.One2many(
         'product.tmpl.operation.vendor', 'product_tmpl_id')
-
+    is_raw_material = fields.Boolean('Raw Material?')
 
 # class ResPartner(models.Model):
 
