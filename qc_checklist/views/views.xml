@@ -178,7 +178,7 @@
         <field name="inherit_id" ref="product.product_template_search_view"></field>
         <field name="arch" type="xml">
             <xpath expr="//filter[1]" position="after">
-                <filter string="Raw Material" name="raw_material" domain="[('is_raw_material','=',True)]"/>
+                <filter string="Raw Material" name="raw_material" domain="[('is_raw_material','=',False)]"/>
             </xpath>
         </field>
     </record>
