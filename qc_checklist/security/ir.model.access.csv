@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_qc_checklist_qc_checklist,qc_checklist.qc_checklist,model_qc_checklist,base.group_user,1,1,1,1
+access_qc_checklist_line,qc_checklist.qc_checklist_line,model_qc_checklist_line,base.group_user,1,1,1,1
+access_qc_checklist_bom,qc_checklist.qc_checklist_bom,model_qc_checklist_bom,base.group_user,1,1,1,,1
+access_qc_checklist_bom_line,qc_checklist.qc_checklist_bom_line,model_qc_checklist_bom_line,base.group_user,1,1,1,,1
+access_product_tmpl_operation_vendor,qc_checklist.product_tmpl_operation_vendor,model_product_tmpl_operation_vendor,base.group_user,1,1,1,,1
