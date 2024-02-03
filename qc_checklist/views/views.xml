@@ -45,18 +45,31 @@
             <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom_id']" position="after">
                 <button name="create_qc_cases" type="object" string="QC Template" class="btn btn-primary"/>
             </xpath>
-            <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="after">
+            <!-- <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="after">
                 <field name="child_product_bom_id" />
-            </xpath>
+            </xpath> -->
             <xpath expr="//field[@name='product_id']" position="after">
-                <field name="is_child_bom" />
+                <field name="product_type" />
             </xpath>
             <xpath expr="//page[@name='operations']" position="attributes">
                 <attribute name="attrs"></attribute>
             </xpath>
-            <xpath expr="//page[@name='operations']/field[@name='operation_ids']" position="attributes">
-                <attribute name="attrs"></attribute>
+            <xpath expr="//page[@name='operations']/field[@name='operation_ids']" position="replace">
+                <field name="process_ids">
+                    <tree editable="bottom"> 
+                        <field name="process_id" />
+                        <field name="vendor_id" options="{'no_create': True}"/>
+                        <field name="vendor_ids" invisible="1" />
+                    </tree>
+                    
+                </field>
             </xpath>
+            <xpath expr="//page[@name='components']/field[@name='bom_line_ids']/tree/field[@name='product_id']" position="attributes">
+                <attribute name="string">Raw Material</attribute>
+            </xpath>
+            <!-- <xpath expr="//page[@name='operations']/field[@name='operation_ids']" position="attributes">
+                <attribute name="attrs"></attribute>
+            </xpath> -->
             <!-- <xpath expr="//page[@name='operations']/field[@name='operation_ids']/tree" position="inside">
                 <field name="vendor_id" />
             </xpath> -->
@@ -68,8 +81,9 @@
         <field name="inherit_id" ref="mrp.mrp_routing_workcenter_bom_tree_view"></field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='workcenter_id']" position="after">
+                <field name="manufacturing_type" />
                 <field name="vendor_id" />
-                <field name="allowed_vendors_ids" invisible="1"/>
+                <!-- <field name="allowed_vendors_ids" invisible="1"/> -->
             </xpath>
         </field>
     </record>
@@ -80,8 +94,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='workcenter_id']" position="after">
                 <!-- <field name="is_subcontractor" /> -->
-                <field name="vendor_id" />
-                <field name="allowed_vendors_ids" invisible="1"/>
+                <field name="manufacturing_type" />
+                <field name="vendor_id" attrs="{'invisible': [('manufacturing_type', '!=', 'subcontract')]}"/>
+                <!-- <field name="allowed_vendors_ids" invisible="1"/> -->
             </xpath>
         </field>
     </record>
@@ -124,6 +139,19 @@
                 <button name="superEng_btn" class="btn btn-primary" type="object"  string="Service Eng. Approve" attrs="{'invisible': ['|', ('is_service_eng', '=', True),('state', 'not in', ('to_close'))]}"/>
                 <button name="is_assembly_superivisor_btn" type="object" class="btn btn-primary" string="Assembly Supervisor Approve" attrs="{'invisible': ['|',('is_assembly_superivisor', '=', True),('state', 'not in', ('to_close'))]}"/>
             </xpath>
+            <xpath expr="//form/sheet/notebook/page[@name='finished_products']" position="after">
+                <page string="Products In Process" name="products_in_process">
+                    <field name="move_workorder_component_ids" >
+                        <tree  >
+                            <field name="product_id" />
+                            <field name="product_uom_qty" />
+                            <field name="quantity_done" />
+                            <field name="lot_ids" />
+                            <field name="state" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
         </field>
     </record>
     <record id="product_template_form_inherit" model="ir.ui.view">
@@ -136,6 +164,7 @@
                     <field name="vendor_list_ids">
                         <tree editable="bottom">
                             <field name="partner_id" />
+                            <!-- <field name="vendor_id" /> -->
                             <!-- <field name="operation_id" /> -->
                         </tree>
                     </field>    
@@ -155,6 +184,9 @@
             <xpath expr="//field[@name='subcontractor_ids']" position="attributes">
                 <attribute name="domain">[('id', 'in', vendor_list_ids)]</attribute>
             </xpath>
+            <!-- <xpath expr="//page[@name='components']/field/tree/field[@name='product_id']" position="attributes">
+                <attribute name="domain">[('is_raw_material', '=', True)]</attribute>
+            </xpath> -->
         </field>
     </record>
 
@@ -187,6 +219,49 @@
         <field name="context">{'default_detailed_type': 'product', 'search_default_raw_material': 1}</field>
     </record>
 
+    <record id="mrp_process_tree_view" model="ir.ui.view">
+        <field name="name">Mrp Process Tree View</field>
+        <field name="model">mrp.process</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="mrp_workcenter_id" />
+                <field name="vendor_ids" widget="many2many_tags" />
+                <field name="process_code" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="mrp_process_form_view" model="ir.ui.view">
+        <field name="name">Mrp Process Form View</field>
+        <field name="model">mrp.process</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="mrp_workcenter_id" />
+                        <field name="vendor_ids" widget="many2many_tags" />
+                        <field name="process_code" />
+                    </group>    
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mrp_process_action" model="ir.actions.act_window">
+        <field name="name">MRP Process</field>
+        <field name="res_model">mrp.process</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem name="Process"
+        id="mrp_process_menu"
+        action="mrp_process_action"
+        parent="mrp.menu_mrp_configuration"
+        />
+
+    <!-- <record id="" -->
 
 
 </odoo>

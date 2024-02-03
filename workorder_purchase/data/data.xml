@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="product_service_template_data" model="product.product">
+            <field name="name">service</field>
+            <field name="type">product</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+        </record>
+
+    </data>
+</odoo>

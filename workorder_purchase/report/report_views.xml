@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="resupply_external_layout_standard">
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="row" style="border:1px solid; border-radius:10px 10px 0 0;">
+                <div class="col-3 mb4">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;"
+                         alt="Logo"/>
+                </div>
+                <div class="col-9 text-end" t-field="company.report_header" name="moto">
+                    <div class="col-12 row">
+                        <div class="col-6 text-center">
+                            <span style="border-bottom:1px solid; font-weight:bold;">JOB CARD</span>
+                        </div>
+                        <div class="col-6">
+                            <span style="font-weight:bold; padding-right:5px;">Mo.
+                                <span t-esc="company.mobile"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12 row text-start">
+                        <h1 style="font-weight:700; letter-spacing: 4px; ">
+                            <t t-esc="company.name"/>
+                        </h1>
+                    </div>
+                    <div class="col-12 row">
+                        <div class="col-1 text-start">
+                        </div>
+                        <div class="col-11 text-start">
+                            <span style="font-weight:bold;">FACTORY :</span>
+                            <t t-esc="company.street"/>
+                            <t t-if="company.street and street2">
+                                ,
+                            </t>
+                            <t t-esc="company.street2"/>
+                            <t t-if="company.street or company.street2">
+                                ,
+                            </t>
+                            <t t-esc="company.city"/>
+                            <t t-if="company.zip">
+                                -
+                            </t>
+                            <t t-if="company.state_id">
+                                (<t t-esc="company.state_id.name"/>)
+                            </t>
+                            <t t-esc="company.country_id.name"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row" style="border-left:1px solid; border-right:1px solid; padding:3px;">
+                <div class="col-12 row">
+                    <div class="col-4">
+                        <span style="font-weight:bold;">CIN :
+                            <span>U29100GJ2020PTC115190</span>
+                        </span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span style="font-weight:bold;">GSTIN :
+                            <span t-esc="company.vat"/>
+                        </span>
+                    </div>
+                    <div class="col-4 text-end">
+                        <span style="font-weight:bold;">PAN NO :
+                            <span>AAHCD8784C</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="border:1px solid; border-radius:0px 0px 10px 10px; padding:3px;">
+                <div class="col-12 row">
+                    <div class="col-7">
+                        <span>Email :
+                            <span t-esc="company.email"/>
+                        </span>
+                    </div>
+                    <div class="col-5 text-end">
+                        <span>Website :
+                            <span t-esc="company.website"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+             t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-5">
+                <!-- This div ensures that the address is not cropped by the header. -->
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center" style="border: 1px solid; border-radius:10px; padding:3px;">
+                <div class="col-12 row">
+                    <div class="col-6 text-start">
+                        <span style="font-weight:bold;">TERMS &amp; CONDITIONS :</span>
+                    </div>
+                    <div class="col-6 text-end">
+                        <span style="font-weight:bold;">For,
+                            <span t-esc="company.name"/>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 row">
+                    <div class="col-9 text-start">
+                        <span style="line-height:2px;">1. Goods onee sold not be tacke back.</span>
+                        <br/>
+                        <span style="line-height:2px;">2. Interest @18% p.a will be chargeed if payment is not made
+                            within due date.
+                        </span>
+                        <br/>
+                        <span style="line-height:2px;">3. Our risk and responsibility ceases as soon as the goods leave
+                            our permises.
+                        </span>
+                        <br/>
+                        <span style="line-height:2px;">4. Subjet to Ahmedabad jurisdiction only.</span>
+                    </div>
+                    <div class="col-3 text-start">
+
+                    </div>
+                </div>
+                <div class="col-12 row" style="margin-top:20px;">
+                    <div class="col-4 text-start">
+                        <span>Received Signature</span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span>E.&amp;.O.E.</span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span style="font-weight:bold;">Authorised Sighnature</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="resupply_external_layout">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+        <t t-call="workorder_purchase.resupply_external_layout_standard">
+            <t t-out="0"/>
+        </t>
+
+    </template>
+
+    <template id="report_resupply_document">
+        <t t-call="web.html_container">
+            <t t-call="workorder_purchase.resupply_external_layout">
+                <t t-set="o" t-value="o.with_context(lang=o._get_report_lang())"/>
+                <div class="row" style="font-size:20px;">
+                    <div class="col-8" style="border:1px solid; border-radius:10px; padding:3px;">
+                        <div class="w-100">
+                            <span style="font-weight:bold;">M/s.</span>
+                            <span t-esc="o.partner_id.name"/>
+                        </div>
+                        <div class="row w-100">
+                            <div class="col-6">
+                                <span style="font-weight:bold;">State :</span>
+                            </div>
+                            <div class="col-6">
+                                <span style="font-weight:bold;">State Code:</span>
+                            </div>
+                        </div>
+                        <div class="row w-100">
+                            <span style="font-weight:bold;">Party's GSTIN NO.</span>
+                        </div>
+                    </div>
+                    <div class="col-4" style="border:1px solid; border-radius:10px; padding:0px;">
+                        <div class="w-100" style="border-bottom:1px solid; padding:0px 3px;">
+                            <span style="font-weight:bold;">Challan No. :</span>
+                        </div>
+                        <div class="w-100" style="border-bottom:1px solid; padding:0px 3px;">
+                            <span style="font-weight:bold;">Challan Date. :</span>
+                        </div>
+                        <div class="w-100" style="border-bottom:1px solid; padding:0px 3px;">
+                            <span style="font-weight:bold;">P.O. No. :</span>
+                        </div>
+                        <div class="w-100" style="border-bottom:1px solid; padding:0px 3px;">
+                            <span style="font-weight:bold;">P.O. Date :</span>
+                        </div>
+                        <div class="w-100" style="padding:0px 3px;">
+                            <span style="font-weight:bold;">Transport Name :</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="border:1px solid; border-radius:10px; padding:2px;">
+                    <div class="col-6">
+                        <span style="font-weight:bold;">Vehicle No :</span>
+                    </div>
+                    <div class="col-6">
+                        <span style="font-weight:bold;">Through :</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="page">
+                        <div style="border:1px solid; border-radius:10px;">
+                            <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
+                                <thead>
+                                    <tr style="border-bottom:1px solid;">
+                                        <th style="border-right:1px solid;" name="th_description" class="text-start">
+                                            <span>SR.No.</span>
+                                        </th>
+                                        <th style="border-right:1px solid;" class="text-center">
+                                            <span>Part Code</span>
+                                        </th>
+                                        <th style="border-right:1px solid;" class="text-center">
+                                            <span>Process</span>
+                                        </th>
+                                        <th style="border-right:1px solid;" class="text-center">
+                                            <span>Description</span>
+                                        </th>
+                                        <th style="border-right:1px solid;" class="text-center">
+                                            <span>Quantity</span>
+                                        </th>
+                                        <th class="text-center">
+                                            <span>Unit</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="invoice_tbody">
+                                    <t t-set="sr_no" t-value="0"/>
+                                    <t t-set="total_qty" t-value="0"/>
+                                    <t t-foreach="o.move_ids" t-as="line">
+                                        <t t-set="sr_no" t-value="sr_no + 1"/>
+                                        <t t-set="total_qty" t-value="total_qty + line.product_uom_qty"/>
+                                        <tr>
+                                            <td style="border-right:1px solid;">
+                                                <span t-esc="sr_no"/>
+                                            </td>
+                                            <td style="border-right:1px solid;">
+                                                <t t-if="line.product_id and line.product_id.default_code">
+                                                    <span t-esc="line.product_id.default_code"/>
+                                                </t>
+                                            </td>
+                                            <td style="border-right:1px solid;">
+                                                <span>
+                                                    <span t-esc="o._get_subcontracting_source_purchase().process_id.name"/>
+                                                </span>
+                                            </td>
+                                            <td style="border-right:1px solid;">
+                                                <t t-if="line.product_id">
+                                                    <span t-esc="line.product_id.display_name"/>
+                                                </t>
+                                            </td>
+                                            <td style="border-right:1px solid;" class="text-center">
+                                                <span t-esc="line.product_uom_qty"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="line.product_uom">
+                                                    <span t-esc="line.product_uom.name"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <tr style="border-bottom:1px solid; border-top:1px solid;">
+                                        <th style="border-right:1px solid; border-top:1px solid;"></th>
+                                        <th style="border-right:1px solid; border-top:1px solid;"></th>
+                                        <th style="border-right:1px solid; border-top:1px solid;"></th>
+                                        <th style="border-right:1px solid; border-top:1px solid;" class="text-center">
+                                            <span>Total Quantity</span>
+                                        </th>
+                                        <th style="border-right:1px solid; border-top:1px solid;" class="text-center">
+                                            <span t-esc="total_qty"/>
+                                        </th>
+                                        <th style=" border-top:1px solid;"></th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+    <template id="print_report_resupply">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="workorder_purchase.report_resupply_document" t-lang="o._get_report_lang()"/>
+        </t>
+    </template>
+</odoo>

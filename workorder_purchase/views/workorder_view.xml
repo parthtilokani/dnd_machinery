@@ -1,0 +1,31 @@
+<odoo>
+    <record model="ir.ui.view" id="workorder_list_view_inherit">
+        <field name="name">MRP workorder view list</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_editable_view"/>
+        <field name="arch" type="xml">
+            <xpath expr='//button[5]' position="after">
+                <button name="action_subcontract" type="object" string="Sub Contract" class="btn-success"
+                 attrs="{'invisible': [('is_subcontract', '=', True)]}"/>
+                <field name="is_subcontract" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_bom_inherited_view" model="ir.ui.view">
+        <field name="name">MRP Production view</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_reception_report']" position="before">
+                <button name="action_view_resupply_order"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-truck">
+                    <field name="resupply_order_count" widget="statinfo" string="Resupply"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

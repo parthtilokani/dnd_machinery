@@ -98,8 +98,8 @@ class MRPBomLine(models.Model):
     _inherit = 'mrp.bom.line'
 
     qc_template_id = fields.Many2one('qc.checklist.bom')
-    child_product_bom_id = fields.Many2one(
-        'mrp.bom', domain="[('is_child_bom','=', True)]", string="BOM")
+    # child_product_bom_id = fields.Many2one(
+    #     'mrp.bom', domain="[('is_child_bom','=', True)]", string="BOM")
 
     # checklist_line_ids = fields.One2many(
     #     'qc.checklist.bom.line', 'mrp_bom_line_id')
@@ -128,23 +128,6 @@ class MRPBomLine(models.Model):
             'res_id': res_id
         }
 
-
-class MRPProduction(models.Model):
-    _inherit = 'mrp.production'
-
-    is_service_eng = fields.Boolean()
-    is_assembly_superivisor = fields.Boolean()
-    service_eng_id = fields.Many2one('res.users')
-    assembly_eng_id = fields.Many2one('res.users')
-
-    def superEng_btn(self):
-        if not self.is_service_eng:
-            self.is_service_eng = True
-
-    def is_assembly_superivisor_btn(self):
-        if not self.is_assembly_superivisor:
-            self.is_assembly_superivisor = True
-
     # {'invisible': ['|', '|', ('state', 'in', ('draft', 'cancel', 'done', 'to_close')), ('qty_producing', '=', 0), ('move_raw_ids', '=', []), ('is_service_eng', '=', False), ('is_assembly_superivisor', '=', False)]}
 
 
@@ -154,15 +137,8 @@ class ProductTemplateOperationVendor(models.Model):
 
     partner_id = fields.Many2one('res.partner')
     product_tmpl_id = fields.Many2one('product.template')
+    vendor_id = fields.Many2one('res.partner')
 
-
-class ProductTemplate(models.Model):
-
-    _inherit = 'product.template'
-
-    vendor_list_ids = fields.One2many(
-        'product.tmpl.operation.vendor', 'product_tmpl_id')
-    is_raw_material = fields.Boolean('Raw Material?')
 
 # class ResPartner(models.Model):
 
@@ -175,9 +151,15 @@ class MrpBom(models.Model):
 
     _inherit = 'mrp.bom'
 
-    is_child_bom = fields.Boolean("Is Part?")
+    # is_child_bom = fields.Boolean("Is Part?")
+    product_type = fields.Selection([('assembly', 'ASSEMBLY'),
+                                     ('sub_assembly', 'SUB ASSEMBLY'),
+                                     ('part', 'Part')],
+                                    default='part',
+                                    string="Product Type")
     vendor_list_ids = fields.One2many(
         related="product_tmpl_id.vendor_list_ids")
+    process_ids = fields.One2many('mrp.bom.process.line', 'bom_id')
 
     @api.constrains('operation_ids', 'byproduct_ids', 'type')
     def _check_subcontracting_no_operation(self):
@@ -188,13 +170,58 @@ class MrpRoutingWorkcenter(models.Model):
 
     _inherit = 'mrp.routing.workcenter'
 
-    allowed_vendors_ids = fields.Many2many(
-        'res.partner', compute="_compute_allowed_value_ids")
+    # allowed_vendors_ids = fields.Many2many(
+    #     'res.partner', compute="_compute_allowed_value_ids")
     vendor_id = fields.Many2one(
-        'res.partner', domain="[('id', 'in', allowed_vendors_ids)]")
+        'res.partner')
+    manufacturing_type = fields.Selection(
+        [('in_house', 'In House'), ('subcontract', 'Subcontract')])
+    process_id = fields.Many2one('mrp.process')
 
-    @api.depends('bom_id.product_tmpl_id')
-    def _compute_allowed_value_ids(self):
-        for rec in self:
-            rec.allowed_vendors_ids = self.env['res.partner'].search(
-                [('id', '=', self.bom_id.product_tmpl_id.vendor_list_ids.mapped('partner_id.id') or [])])
+    # @api.depends('bom_id.product_tmpl_id')
+    # def _compute_allowed_value_ids(self):
+    #     for rec in self:
+    #         rec.allowed_vendors_ids = self.env['res.partner'].search(
+    #             [('id', '=', self.bom_id.product_tmpl_id.vendor_list_ids.mapped('partner_id.id') or [])])
+
+
+class ManufacturingProcess(models.Model):
+
+    _name = 'mrp.process'
+
+    name = fields.Char('Name')
+    code = fields.Char('Code')
+    mrp_workcenter_id = fields.Many2one('mrp.workcenter', 'Work Center')
+    vendor_ids = fields.Many2many('res.partner')
+    process_code = fields.Char('Code')
+
+
+class MrpBomProcessLine(models.Model):
+
+    _name = 'mrp.bom.process.line'
+
+    process_id = fields.Many2one('mrp.process', "Process")
+    bom_id = fields.Many2one('mrp.bom')
+    vendor_ids = fields.Many2many(related="process_id.vendor_ids")
+    vendor_id = fields.Many2one(
+        'res.partner', domain="[('id', 'in', vendor_ids)]")
+    routing_workcenter_id = fields.Many2one(
+        'mrp.routing.workcenter', ondelete="cascade")
+
+    @api.model
+    def create(self, vals):
+        print("create process lines.............")
+        mrp_routing_workcenter_obj = self.env['mrp.routing.workcenter']
+        res = super(MrpBomProcessLine, self).create(vals)
+        default_vals = mrp_routing_workcenter_obj.default_get(
+            self.env['mrp.routing.workcenter']._fields)
+        print("default_vals", default_vals)
+        default_vals.update({
+            'name': res.process_id.name,
+            'workcenter_id': res.process_id.mrp_workcenter_id.id,
+            'bom_id': res.bom_id.id,
+            'process_id': res.process_id.id
+        })
+        res.routing_workcenter_id = mrp_routing_workcenter_obj.create(
+            default_vals)
+        return res
