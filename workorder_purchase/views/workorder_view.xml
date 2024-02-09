@@ -7,6 +7,8 @@
             <xpath expr='//button[5]' position="after">
                 <button name="action_subcontract" type="object" string="Sub Contract" class="btn-success"
                  attrs="{'invisible': [('is_subcontract', '=', True)]}"/>
+                 <button name="action_jobcard" type="object" string="Create Jobcard" class="btn-success"
+                 />
                 <field name="is_subcontract" invisible="1"/>
             </xpath>
         </field>

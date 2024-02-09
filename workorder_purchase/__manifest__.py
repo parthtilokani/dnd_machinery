@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'mrp_subcontracting', 'purchase', 'qc_checklist'],
+    'depends': ['base', 'mrp', 'mrp_subcontracting', 'purchase', 'qc_checklist', 'stock'],
 
     # always loaded
     'data': [
